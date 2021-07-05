@@ -19,10 +19,25 @@ func NewServer() *Server {
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	 s.router.ServeHTTP(w, r)
+	s.router.ServeHTTP(w, r)
 }
 
-func (s *Server) handleHelloWorld(c *gin.Context){
-	ip, _ := c.RemoteIP()
-	c.String(http.StatusOK, "Hello %s ", ip.String())
+func (s *Server) handleHelloWorld()func(c *gin.Context) {
+	return func(c *gin.Context){
+		ip, _ := c.RemoteIP()
+		c.String(http.StatusOK, "Hello %s ", ip.String())
+	}
+}
+
+func (s *Server) handlePostReview() func(c *gin.Context) {
+	type request struct {
+		Name         string   `json:"name"`
+		Score        float64  `json:"score"`
+		TestingNotes []string `json:"tasting-notes"`
+	}
+	return func(c *gin.Context){
+		var data request
+		c.BindJSON(&data)
+		c.String(http.StatusOK, "Hello %v", data)
+	}
 }
